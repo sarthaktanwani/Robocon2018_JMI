@@ -9,22 +9,22 @@
  *   - 2e colmun: Stef?
  * replace pin numbers by the ones you use
  ******************************************************************/
-#define PS2_DAT        12  //14    
-#define PS2_CMD        11  //15
-#define PS2_SEL        10  //16
-#define PS2_CLK        13  //17
-#define m1a 0
-#define m1b 1
-#define m2a 2
-#define m2b 3
-#define m3a 4
-#define m3b 5
-#define m4a 6
-#define m4b 7
-#define en1 A0
-#define en2 A1
-#define en3 A2
-#define en4 A3
+#define PS2_DAT 12  //14    
+#define PS2_CMD 11  //15
+#define PS2_SEL 10  //16
+#define PS2_CLK 13  //17
+#define m1a 36
+#define m1b 37
+#define m2a 38
+#define m2b 39
+#define m3a 35
+#define m3b 34
+#define m4a 40
+#define m4b 41
+#define en1 5
+#define en2 3
+#define en3 8
+#define en4 9
 
 /******************************************************************
  * select modes of PS2 controller:
@@ -63,10 +63,21 @@ Adafruit_DCMotor *R_M4 = AFMS.getMotor(4);
 
 
 void setup(){
- 
+  pinMode(m1a,OUTPUT);
+  pinMode(m1b,OUTPUT);
+  pinMode(m2a,OUTPUT);
+  pinMode(m2b,OUTPUT);
+  pinMode(m3a,OUTPUT);
+  pinMode(m3b,OUTPUT);
+  pinMode(m4a,OUTPUT);
+  pinMode(m4b,OUTPUT);
+  pinMode(en1,OUTPUT);
+  pinMode(en2,OUTPUT);
+  pinMode(en3,OUTPUT);
+  pinMode(en4,OUTPUT);
   Serial.begin(9600);
   
-  delay(3000);  //added delay to give wireless ps2 module some time to startup, before configuring it
+  delay(5000);  //added delay to give wireless ps2 module some time to startup, before configuring it
   Serial.print("===================================");
   //CHANGES for v1.6 HERE!!! **************PAY ATTENTION*************
   
@@ -119,8 +130,8 @@ void setup(){
   AFMS.begin(50);  // create with the default frequency 1.6KHz
 
 }
-
 void loop() {
+  
   int y14,y23,xVal1, yVal1, buttonVal1,xVal2, yVal2, buttonVal2;
  
   /* You must Read Gamepad to get new values and set vibration values
@@ -128,45 +139,15 @@ void loop() {
      if you don't enable the rumble, use ps2x.read_gamepad(); with no values
      You should call this at least once a second
    */  
-  // Serial.print("==================444=================\n");
- /* if(error == 1) //skip loop if no controller found
-    return; 
+   //Serial.print("==================444=================\n");
+ // if(error == 1) //skip loop if no controller found
+   // return; 
   
-  if(type == 2){ //Guitar Hero Controller
-//    ps2x.read_gamepad();          //read controller
-}*/
-//   
-//    if(ps2x.ButtonPressed(GREEN_FRET))
-//      Serial.println("Green Fret Pressed");
-//    if(ps2x.ButtonPressed(RED_FRET))
-//      Serial.println("Red Fret Pressed");
-//    if(ps2x.ButtonPressed(YELLOW_FRET))
-//      Serial.println("Yellow Fret Pressed");
-//    if(ps2x.ButtonPressed(BLUE_FRET))
-//      Serial.println("Blue Fret Pressed");
-//    if(ps2x.ButtonPressed(ORANGE_FRET))
-//      Serial.println("Orange Fret Pressed"); 
-//
-//    if(ps2x.ButtonPressed(STAR_POWER))
-//      Serial.println("Star Power Command");
-//    
-//    if(ps2x.Button(UP_STRUM))          //will be TRUE as long as button is pressed
-//      Serial.println("Up Strum");
-//    if(ps2x.Button(DOWN_STRUM))
-//      Serial.println("DOWN Strum");
-// 
-//    if(ps2x.Button(PSB_START))         //will be TRUE as long as button is pressed
-//      Serial.println("Start is being held");
-//    if(ps2x.Button(PSB_SELECT))
-//      Serial.println("Select is being held");
-//    
-//    if(ps2x.Button(ORANGE_FRET)) {     // print stick value IF TRUE
-//      Serial.print("Wammy Bar Position:");
-//      Serial.println(ps2x.Analog(WHAMMY_BAR), DEC); 
-//    } 
-  
-  //else { //DualShock Controller
-    /*ps2x.read_gamepad(false, vibrate); //read controller and set large motor to spin at 'vibrate' speed
+  /*if(type == 2){ //Guitar Hero Controller
+   ps2x.read_gamepad();          //read controller
+    }*/
+
+      ps2x.read_gamepad(false, vibrate); //read controller and set large motor to spin at 'vibrate' speed
     
     if(ps2x.Button(PSB_START))         //will be TRUE as long as button is pressed
       Serial.println("Start is being held");
@@ -228,133 +209,123 @@ void loop() {
       ps2x.read_gamepad(true, vibrate);   
   }
     if(ps2x.ButtonReleased(PSB_SQUARE))              //will be TRUE if button was JUST released
-      Serial.println("Square just released");     
-//    lx= ps2x.Analog(PSS_LX);
-//    ly= ps2x.Analog(PSS_LY);
-//
-//   if(ly>130){
-//      ly=(ly-128)*2;
-////      L_M3->setSpeed(ly);
-//      L_M3->run(FORWARD);
-////      L_M3->setSpeed(ly);
-//      R_M4->run(FORWARD);
-//    }else if(ly<125){
-//      ly=(127-ly)*2;
-//  //    L_M3->setSpeed(ly);
-//      L_M3->run(BACKWARD);
-//      R_M4->run(BACKWARD);
-//    }else{
-//      L_M3->run(RELEASE);
-//      R_M4->run(RELEASE);
-//    }
-//    
-//    if(lx>130){
-//       lx=(lx-128)*2;
-//       L_M3->setSpeed(ly);
-//       R_M4->setSpeed(ly-lx);
-//    }else if(lx<125){
-//       lx=(127-lx)*2;
-//       L_M3->setSpeed(ly-lx);
-//       R_M4->setSpeed(ly);       
-//    }else{
-//       L_M3->setSpeed(ly);
-//       R_M4->setSpeed(ly);  
-//    }
-//
-*/
-  
-    if(ps2x.Button(PSB_L1) || ps2x.Button(PSB_R1)) { //print stick values if either is TRUE
+      Serial.println("Square just released");       
+   // if(ps2x.Button(PSB_L1) || ps2x.Button(PSB_R1)) { //print stick values if either is TRUE
+    while(1)
+      {
+      ps2x.read_gamepad();
+      //ps2x.read_gamepad(false, vibrate);
+      //vibrate = ps2x.Analog(PSAB_CROSS);  
       Serial.print("Stick Values:");
-      Serial.print(ps2x.Analog(PSS_LY), DEC); //Left stick, Y axis. Other options: LX, RY, RX  
-      Serial.print(",");
-      Serial.print(ps2x.Analog(PSS_LX), DEC); 
-      Serial.print(",");
-      Serial.print(ps2x.Analog(PSS_RY), DEC); 
-      Serial.print(",");
-      Serial.println(ps2x.Analog(PSS_RX), DEC); 
+     // Serial.print(ps2x.Analog(PSS_LY), DEC); //Left stick, Y axis. Other options: LX, RY, RX  
+      //Serial.print(",\t");
+      //Serial.print(ps2x.Analog(PSS_LX), DEC); 
+      //Serial.print(",\t");
+      //Serial.print(ps2x.Analog(PSS_RY), DEC); 
+      //Serial.print(",\t");
+      //Serial.println(ps2x.Analog(PSS_RX), DEC); 
+     
       xVal1 = ps2x.Analog(PSS_LX);
-  yVal1 = ps2x.Analog(PSS_LY);
-
-  xVal2 = ps2x.Analog(PSS_RX);
-  yVal2 = ps2x.Analog(PSS_RY);
-  Serial.println(yVal2);
-
+      yVal1 = ps2x.Analog(PSS_LY);
+      xVal2 = ps2x.Analog(PSS_RX);
+      yVal2 = ps2x.Analog(PSS_RY);
+      
+      
+      Serial.print(yVal1); 
+      Serial.print(",\t");
+      Serial.print(yVal2); 
+      Serial.print(",\t");
+      Serial.print(xVal1); 
+      Serial.print(",\t");
+      Serial.println(xVal2); 
   if(yVal1 == 127 && yVal2 == 127)
   {
-    //go backward
-    y14=map(yVal1,127,255,0,255);
-    y23=map(yVal2,127,255,0,255);
+    digitalWrite(m1a,LOW);
+    digitalWrite(m1b,LOW);
     digitalWrite(m2a,LOW);
     digitalWrite(m2b,LOW);
     digitalWrite(m3a,LOW);
     digitalWrite(m3b,LOW);
-    analogWrite(en2,y23);
-    analogWrite(en3,y23);
-      
+    digitalWrite(m4a,LOW);
+    digitalWrite(m4b,LOW);
    }     
   else if(yVal1 < 127 && yVal2 < 127)
   {
     //go forward
-    y14=map(yVal1,127,0,0,255);
-    y23=map(yVal2,127,0,0,255);
-    digitalWrite(m2a,LOW);
-    digitalWrite(m2b,HIGH);
+    y14=map(yVal1,127,0,50,255);
+    y23=map(yVal2,127,0,50,255);
+    digitalWrite(m1a,LOW);
+    digitalWrite(m1b,HIGH);
+    digitalWrite(m2a,HIGH);
+    digitalWrite(m2b,LOW);
     digitalWrite(m3a,LOW);
     digitalWrite(m3b,HIGH);
-    //Serial.print(yVal2);
-    //Serial.print("\n");
+    digitalWrite(m4a,HIGH);
+    digitalWrite(m4b,LOW);
+    analogWrite(en1,y14);
     analogWrite(en2,y23);
     analogWrite(en3,y23);
+    analogWrite(en4,y14);
     
     }
 
     else if(yVal1 < 127 && yVal2 > 127)
   {
     //go clockwise
-    y14=map(yVal1,127,0,0,255);
-    y23=map(yVal2,127,255,0,255);
-    digitalWrite(m2a,HIGH);
-    digitalWrite(m2b,LOW);
+    y14=map(yVal1,127,0,50,255);
+    y23=map(yVal2,127,255,50,255);
+    digitalWrite(m1a,LOW);
+    digitalWrite(m1b,HIGH);
+    digitalWrite(m2a,LOW);
+    digitalWrite(m2b,HIGH);
     digitalWrite(m3a,HIGH);
     digitalWrite(m3b,LOW);
+    digitalWrite(m4a,HIGH);
+    digitalWrite(m4b,LOW);
+    analogWrite(en1,y14);
     analogWrite(en2,y23);
     analogWrite(en3,y23);
-    //Serial.print(yVal2);
-    //Serial.print("\n");
+    analogWrite(en4,y14);
     }
-
     else if(yVal1 > 127 && yVal2 < 127)
   {
     //go anti-clockwise
-    y14=map(yVal1,127,255,0,255);
-    y23=map(yVal2,127,0,0,255);
-    digitalWrite(m2a,LOW);
-    digitalWrite(m2b,HIGH);
+    y14=map(yVal1,127,255,50,255);
+    y23=map(yVal2,127,0,50,255);
+    digitalWrite(m1a,HIGH);
+    digitalWrite(m1b,LOW);
+    digitalWrite(m2a,HIGH);
+    digitalWrite(m2b,LOW);
     digitalWrite(m3a,LOW);
     digitalWrite(m3b,HIGH);
+    digitalWrite(m4a,LOW);
+    digitalWrite(m4b,HIGH);
+    analogWrite(en1,y14);
     analogWrite(en2,y23);
     analogWrite(en3,y23);
-    //Serial.print(yVal2);
-    //Serial.print("\n");
+    analogWrite(en4,y14);
     }
 
     else if(yVal1 > 127 && yVal2 > 127)
   {
     //go backward
-    y14=map(yVal1,127,255,0,255);
-    y23=map(yVal2,127,255,0,255);
-    digitalWrite(m2a,HIGH);
-    digitalWrite(m2b,LOW);
+    y14=map(yVal1,127,255,50,255);
+    y23=map(yVal2,127,255,50,255);
+    digitalWrite(m1a,HIGH);
+    digitalWrite(m1b,LOW);
+    digitalWrite(m2a,LOW);
+    digitalWrite(m2b,HIGH);
     digitalWrite(m3a,HIGH);
     digitalWrite(m3b,LOW);
+    digitalWrite(m4a,LOW);
+    digitalWrite(m4b,HIGH);
+    analogWrite(en1,y14);
     analogWrite(en2,y23);
     analogWrite(en3,y23);
-    //Serial.print(yVal2);
-    //Serial.print("\n");
+    analogWrite(en4,y14);      
   }
-  
- // }
+ }
   delay(50);  
 //      L_M3->run(RELEASE);
 //      R_M4->run(RELEASE);
-}}
+}
