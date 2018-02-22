@@ -4,6 +4,7 @@
                           //OR red 5V , black GND , white Data 
 #include "Adafruit_MotorShield.h"
 #include "Adafruit_MS_PWMServoDriver.h"
+//updated with servo code
 
 /******************************************************************
  * set pins connected to PS2 controller:
@@ -66,7 +67,21 @@ Adafruit_DCMotor *R_M4 = AFMS.getMotor(4);
 // You can also make another motor on port M2
 //Adafruit_DCMotor *myOtherMotor = AFMS.getMotor(2);
 
-
+void reset (int pos1)
+  {
+  int a; 
+  if (pos1==0)
+  return pos1;
+  else 
+  {
+    for (a = pos1; a >= 0; a -= 1) { // goes from 180 degrees to 0 degrees
+  
+    myservo1.write(a);              // tell servo to go to position in variable 'pos'
+    delay(15);                       // waits 15ms for the servo to reach the position
+    }
+    return a;
+  }
+  }
 void setup(){
   pinMode(m1a,OUTPUT);
   pinMode(m1b,OUTPUT);
@@ -147,13 +162,12 @@ void loop() {
      You should call this at least once a second
    */  
    //Serial.print("==================444=================\n");
- // if(error == 1) //skip loop if no controller found
-   // return; 
+  //if(error == 1) //skip loop if no controller found
+    //return; 
   
   /*if(type == 2){ //Guitar Hero Controller
    ps2x.read_gamepad();          //read controller
-    }*/
-
+    }*/          
       ps2x.read_gamepad(false, vibrate); //read controller and set large motor to spin at 'vibrate' speed
     
     if(ps2x.Button(PSB_START))         //will be TRUE as long as button is pressed
@@ -230,45 +244,76 @@ void loop() {
       //Serial.print(",\t");
       //Serial.print(ps2x.Analog(PSS_RY), DEC); 
       //Serial.print(",\t");
-      //Serial.println(ps2x.Analog(PSS_RX), DEC); 
-     if(ps2x.Button(PSB_R2))
-    {
-      
-  
-      if(ps2x.Button(PSB_PAD_UP))       //will be TRUE as long as button is pressed
+      //Serial.println(ps2x.Analog(PSS_RX), DEC);
+      if(ps2x.Button(PSB_L1))
       {
-        for (pos1 = 0; pos1 <= 180; pos1 += 1) { // goes from 0 degrees to 180 degrees
-      // in steps of 1 degree
-      myservo1.write(pos1);              // tell servo to go to position in variable 'pos'
-      delay(10);                       // waits 15ms for the servo to reach the position
-    }
-      for (pos1 = 180; pos1 >= 0; pos1 -= 1) { // goes from 180 degrees to 0 degrees
-    myservo1.write(pos1);              // tell servo to go to position in variable 'pos'
-    delay(10);                       // waits 15ms for the servo to reach the position
-        /*Serial.print("Up held this hard: ");
-        Serial.println(ps2x.Analog(PSAB_PAD_UP), DEC);*/
-      }
-      if(ps2x.Button(PSB_PAD_DOWN))
-      {
-        Serial.print("DOWN held this hard: ");
-        Serial.println(ps2x.Analog(PSAB_PAD_DOWN), DEC);
-      }
-      if(ps2x.Button(PSB_PAD_RIGHT))
-      {
-      Serial.print("Right held this hard: ");
-      Serial.println(ps2x.Analog(PSAB_PAD_RIGHT), DEC);
-      }
-      if(ps2x.Button(PSB_PAD_LEFT))
-      {
-        Serial.print("LEFT held this hard: ");
-        Serial.println(ps2x.Analog(PSAB_PAD_LEFT), DEC);
-      }
+        if(ps2x.Analog(PSS_LY)>130)       //will be TRUE as long as button is pressed
+        {
+         
+          while(ps2x.Analog(PSS_LY)>130)
+          { ps2x.read_gamepad();
+            pos1++;                                 // goes from 0 degrees to 180 degrees
+                                             // in steps of 1 degree
+            myservo1.write(pos1);            // tell servo to go to position in variable 'pos'
+            delay(15);                       // waits 15ms for the servo to reach the position
+          if(pos1 > 180)
+          pos1 = 180;
+          }
+          Serial.print("Up held this hard: ");
+          Serial.println(ps2x.Analog(PSAB_PAD_UP), DEC);
+          Serial.println("pos1 is: ");
+          Serial.println(pos1);
+        }
+        if(ps2x.Analog(PSS_LY)<120)
+        {
+          while(ps2x.Analog(PSS_LY)<120)
+          { ps2x.read_gamepad();
+            pos1--;                                 // goes from 0 degrees to 180 degrees
+            if(pos1 < 0)
+            break;                                 // in steps of 1 degree
+            myservo1.write(pos1);            // tell servo to go to position in variable 'pos'
+            delay(15);                       // waits 15ms for the servo to reach the position
+          }
+          //Serial.print("DOWN held this hard: ");
+          //Serial.println(ps2x.Analog(PSAB_PAD_DOWN), DEC);
+          Serial.println("pos1 is: ");
+          Serial.println(pos1);
+        }
+        if(ps2x.Analog(PSS_RX)>130)
+        {
+          while(ps2x.Analog(PSS_RX)>130)
+          { ps2x.read_gamepad();
+            pos2++;                                 // goes from 0 degrees to 180 degrees
+            if(pos2 > 180)
+            pos2=180;                                 // in steps of 1 degree
+            myservo2.write(pos2);            // tell servo to go to position in variable 'pos'
+            delay(15);                       // waits 15ms for the servo to reach the position
+          }
+          //Serial.print("Right held this hard: ");
+          //Serial.println(ps2x.Analog(PSAB_PAD_RIGHT), DEC);
+          Serial.println("pos2 is: ");
+          Serial.println(pos2);
+        }
+        if(ps2x.Analog(PSS_RX)<120)
+        {
+          while(ps2x.Analog(PSS_RX)<120)
+          { ps2x.read_gamepad();
+            pos2--;                                 // goes from 0 degrees to 180 degrees
+            if(pos2 < 0)
+            pos2=0;                                 // in steps of 1 degree
+            myservo2.write(pos2);            // tell servo to go to position in variable 'pos'
+            delay(15);                       // waits 15ms for the servo to reach the position
+          }
+          //Serial.print("LEFT held this hard: ");
+          //Serial.println(ps2x.Analog(PSAB_PAD_LEFT), DEC);
+          Serial.println("pos2 is: ");
+          Serial.println(pos2);
+        }
       } 
-    }
     else
-    Serial.println("NOT WORKING!!!");
+    Serial.println("...");
      int x,y;
-     /*if (ps2x.Button(PSB_L1)) // OMNI wheel
+     if (ps2x.Button(PSB_R1)) // OMNI wheel
     {
       xVal1 = ps2x.Analog(PSS_LX);
       yVal1 = ps2x.Analog(PSS_LY);
@@ -418,8 +463,9 @@ void loop() {
       digitalWrite(en2, LOW);
       digitalWrite(en3, LOW);
       digitalWrite(en4, LOW);
-    }*/
+    }
   }
+  Serial.println("\t\t\t\twhile 1 ke bahar");
   delay(50);  
 //      L_M3->run(RELEASE);
 //      R_M4->run(RELEASE);
