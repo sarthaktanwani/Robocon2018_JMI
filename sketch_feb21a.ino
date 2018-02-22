@@ -4,7 +4,7 @@
                           //OR red 5V , black GND , white Data 
 #include "Adafruit_MotorShield.h"
 #include "Adafruit_MS_PWMServoDriver.h"
-//updated with servo code
+//update: servo code working!!
 
 /******************************************************************
  * set pins connected to PS2 controller:
@@ -247,63 +247,62 @@ void loop() {
       //Serial.println(ps2x.Analog(PSS_RX), DEC);
       if(ps2x.Button(PSB_L1))
       {
-        Serial.println(ps2x.Analog(PSS_LY));
-        Serial.print(",");
-        Serial.print(ps2x.Analog(PSS_RX));
+        //Serial.println(ps2x.Analog(PSS_LY));
+        //Serial.print(",");
+        //Serial.print(ps2x.Analog(PSS_RX));
         if(ps2x.Analog(PSS_LY)>128)       //will be TRUE as long as button is pressed
         {
-         //Serial.println("pos1 is: ");
+         Serial.print("\npos1 is: ");
           while(ps2x.Analog(PSS_LY)>128)
           { ps2x.read_gamepad();
             pos1++;                                 // goes from 0 degrees to 180 degrees
-            //Serial.println(ps2x.Analog(PSS_LY));
-            //Serial.print(pos1);
-            //Serial.print("\n");                                 // in steps of 1 degree
+            if(pos1 > 180)
+            pos1 = 180;
+            Serial.print(pos1);
+            Serial.print("\n");                                 // in steps of 1 degree
             myservo1.write(pos1);            // tell servo to go to position in variable 'pos'
-            delay(10);                       // waits 15ms for the servo to reach the position
-          if(pos1 > 180)
-          pos1 = 180;
+            delay(8);                       // waits 15ms for the servo to reach the position
+          
           }
         }
-        if(ps2x.Analog(PSS_LY)<127)
+        if(ps2x.Analog(PSS_LY)<128)
         {
-          //Serial.println("pos1 is: ");
+          Serial.print("\npos1 is: ");
           while(ps2x.Analog(PSS_LY)<127)
           { ps2x.read_gamepad();
             pos1--;                                 // goes from 0 degrees to 180 degrees
             if(pos1<0)
             pos1=0;
-            //Serial.println(ps2x.Analog(PSS_LY));
-            //Serial.print(pos1);               // in steps of 1 degree
-            //Serial.print("\n");
+            Serial.print(pos1);               // in steps of 1 degree
+            Serial.print("\n");
             myservo1.write(pos1);            // tell servo to go to position in variable 'pos'
-            delay(10);                       // waits 15ms for the servo to reach the position
+            delay(8);                       // waits 15ms for the servo to reach the position
           }
         }
-        if(ps2x.Analog(PSS_RX)>128)
+        if(ps2x.Analog(PSS_RX)>127)
         {
-          //Serial.println("pos2 is: ");
+          Serial.print("\npos2 is: ");
           while(ps2x.Analog(PSS_RX)>128)
           { ps2x.read_gamepad();
             pos2++;                                 // goes from 0 degrees to 180 degrees
             if(pos2 > 180)
             pos2=180;                                 // in steps of 1 degree
-            //Serial.print(pos2);
-            //Serial.print("\n");
+            Serial.print(pos2);
+            Serial.print("\n");
             myservo2.write(pos2);            // tell servo to go to position in variable 'pos'
             delay(10);                       // waits 15ms for the servo to reach the position
           }
         }
         if(ps2x.Analog(PSS_RX)<127)
         {
-          //Serial.println("pos2 is: ");
+          Serial.print("\npos2 is: ");
           while(ps2x.Analog(PSS_RX)<127)
           { ps2x.read_gamepad();
             pos2--;                                 // goes from 0 degrees to 180 degrees
             if(pos2 < 0)
             pos2=0;                                 // in steps of 1 degree
-            //Serial.print(pos2);
-            //Serial.print("\n");
+            Serial.print(pos2);
+            Serial.print("\n");
             myservo2.write(pos2);            // tell servo to go to position in variable 'pos'
             delay(10);                       // waits 15ms for the servo to reach the position
           }
