@@ -1,5 +1,7 @@
 #include "PS2X_lib.h"  //for v1.6
 #include <Wire.h>
+#include<Servo.h>         //orange -> data , red -> 5V , brown -> GND 
+                          //OR red 5V , black GND , white Data 
 #include "Adafruit_MotorShield.h"
 #include "Adafruit_MS_PWMServoDriver.h"
 
@@ -25,7 +27,8 @@
 #define en2 3
 #define en3 8
 #define en4 9
-
+#define servo1 6
+#define servo2 7
 /******************************************************************
  * select modes of PS2 controller:
  *   - pressures = analog reading of push-butttons 
@@ -38,6 +41,8 @@
 #define rumble      true
 
 PS2X ps2x; // create PS2 Controller Class
+Servo myservo1,myservo2,myservo3;       //myservo3 is for hook
+int pos1 = 0,pos2 = 0;    // variable to store the servo position
 
 //right now, the library does NOT support hot pluggable controllers, meaning 
 //you must always either restart your Arduino after you connect the controller, 
@@ -75,6 +80,8 @@ void setup(){
   pinMode(en2,OUTPUT);
   pinMode(en3,OUTPUT);
   pinMode(en4,OUTPUT);
+  myservo1.attach(servo1);
+  myservo2.attach(servo2);
   Serial.begin(9600);
   
   delay(5000);  //added delay to give wireless ps2 module some time to startup, before configuring it
@@ -216,7 +223,7 @@ void loop() {
       ps2x.read_gamepad();
       //ps2x.read_gamepad(false, vibrate);
       //vibrate = ps2x.Analog(PSAB_CROSS);  
-      Serial.print("Stick Values:");
+      //Serial.print("Stick Values:");
      // Serial.print(ps2x.Analog(PSS_LY), DEC); //Left stick, Y axis. Other options: LX, RY, RX  
       //Serial.print(",\t");
       //Serial.print(ps2x.Analog(PSS_LX), DEC); 
@@ -224,8 +231,44 @@ void loop() {
       //Serial.print(ps2x.Analog(PSS_RY), DEC); 
       //Serial.print(",\t");
       //Serial.println(ps2x.Analog(PSS_RX), DEC); 
+     if(ps2x.Button(PSB_R2))
+    {
+      
+  
+      if(ps2x.Button(PSB_PAD_UP))       //will be TRUE as long as button is pressed
+      {
+        for (pos1 = 0; pos1 <= 180; pos1 += 1) { // goes from 0 degrees to 180 degrees
+      // in steps of 1 degree
+      myservo1.write(pos1);              // tell servo to go to position in variable 'pos'
+      delay(10);                       // waits 15ms for the servo to reach the position
+    }
+      for (pos1 = 180; pos1 >= 0; pos1 -= 1) { // goes from 180 degrees to 0 degrees
+    myservo1.write(pos1);              // tell servo to go to position in variable 'pos'
+    delay(10);                       // waits 15ms for the servo to reach the position
+        /*Serial.print("Up held this hard: ");
+        Serial.println(ps2x.Analog(PSAB_PAD_UP), DEC);*/
+      }
+      if(ps2x.Button(PSB_PAD_DOWN))
+      {
+        Serial.print("DOWN held this hard: ");
+        Serial.println(ps2x.Analog(PSAB_PAD_DOWN), DEC);
+      }
+      if(ps2x.Button(PSB_PAD_RIGHT))
+      {
+      Serial.print("Right held this hard: ");
+      Serial.println(ps2x.Analog(PSAB_PAD_RIGHT), DEC);
+      }
+      if(ps2x.Button(PSB_PAD_LEFT))
+      {
+        Serial.print("LEFT held this hard: ");
+        Serial.println(ps2x.Analog(PSAB_PAD_LEFT), DEC);
+      }
+      } 
+    }
+    else
+    Serial.println("NOT WORKING!!!");
      int x,y;
-     if (ps2x.Button(PSB_L1)) // OMNI wheel
+     /*if (ps2x.Button(PSB_L1)) // OMNI wheel
     {
       xVal1 = ps2x.Analog(PSS_LX);
       yVal1 = ps2x.Analog(PSS_LY);
@@ -369,14 +412,13 @@ void loop() {
         Serial.println("Clockwise rotate");
       }
     }
-      
     else
     { Serial.println("Omni Off");
       digitalWrite(en1, LOW);
       digitalWrite(en2, LOW);
       digitalWrite(en3, LOW);
       digitalWrite(en4, LOW);
-    }
+    }*/
   }
   delay(50);  
 //      L_M3->run(RELEASE);
