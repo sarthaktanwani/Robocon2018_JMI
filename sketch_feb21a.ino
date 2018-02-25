@@ -2,9 +2,13 @@
 #include <Wire.h>
 #include<Servo.h>         //orange -> data , red -> 5V , brown -> GND 
                           //OR red 5V , black GND , white Data 
+                          //limits of the servo with red tape 90 to 180
+                          //limits of the other one 98 to 8
 #include "Adafruit_MotorShield.h"
 #include "Adafruit_MS_PWMServoDriver.h"
 //update: servo code working!!
+//update2: mecanum code also working!!
+//to-do -> use both together
 
 /******************************************************************
  * set pins connected to PS2 controller:
@@ -12,22 +16,23 @@
  *   - 2e colmun: Stef?
  * replace pin numbers by the ones you use
  ******************************************************************/
-#define PS2_DAT 12  //14    
+#define PS2_DAT 12  //14
 #define PS2_CMD 11  //15
 #define PS2_SEL 10  //16
 #define PS2_CLK 13  //17
-#define m1a 36
-#define m1b 37
-#define m2a 38
-#define m2b 39
-#define m3a 35
-#define m3b 34
-#define m4a 40
-#define m4b 41
+#define m1a 37
+#define m1b 36
+#define m2a 39
+#define m2b 38
+#define m3a 40
+#define m3b 41
+#define m4a 42
+#define m4b 43
 #define en1 5
 #define en2 3
 #define en3 8
 #define en4 9
+#define servo0 2
 #define servo1 6
 #define servo2 7
 /******************************************************************
@@ -36,15 +41,17 @@
  *   - rumble    = motor rumbling
  * uncomment 1 of the lines for each mode selection
  ******************************************************************/
-//#define pressures   true
 #define pressures   true 
-//#define rumble      true
 #define rumble      true
 
 PS2X ps2x; // create PS2 Controller Class
-Servo myservo1,myservo2,myservo3;       //myservo3 is for hook
-int pos1 = 0,pos2 = 0;    // variable to store the servo position
-
+Servo myservo0,myservo1,myservo2,myservo3;       //myservo3 is for hook
+//const int offset01=40;
+const int ul_01=180;
+const int ll_01=0;
+const int ul_2=180;
+const int ll_2=0;
+int pos1 = 90,pos0 = 0,pos2 = 90;    // variable to store the servo position
 //right now, the library does NOT support hot pluggable controllers, meaning 
 //you must always either restart your Arduino after you connect the controller, 
 //or call config_gamepad(pins) again after connecting the controller.
@@ -95,6 +102,7 @@ void setup(){
   pinMode(en2,OUTPUT);
   pinMode(en3,OUTPUT);
   pinMode(en4,OUTPUT);
+  myservo0.attach(servo0);
   myservo1.attach(servo1);
   myservo2.attach(servo2);
   Serial.begin(9600);
@@ -133,7 +141,7 @@ void setup(){
   
 //  Serial.print(ps2x.Analog(1), HEX);
   
-  type = ps2x.readType(); 
+  type = ps2x.readType();
   switch(type) {
     case 0:
       Serial.print("Unknown Controller type found ");
@@ -252,55 +260,68 @@ void loop() {
         //Serial.print(ps2x.Analog(PSS_RX));
         if(ps2x.Analog(PSS_LY)>128)       //will be TRUE as long as button is pressed
         {
-         Serial.print("\npos1 is: ");
+         Serial.print("\npos0 is: ");
           while(ps2x.Analog(PSS_LY)>128)
           { ps2x.read_gamepad();
+            //pos0++;
             pos1++;                                 // goes from 0 degrees to 180 degrees
             if(pos1 > 180)
-            pos1 = 180;
+            {
+              pos1 = 180;
+              //pos1 = 180 - offset01;
+            }
             Serial.print(pos1);
-            Serial.print("\n");                                 // in steps of 1 degree
-            myservo1.write(pos1);            // tell servo to go to position in variable 'pos'
+            Serial.print("           ");                                 // in steps of 1 degree
+            Serial.println(188-pos1);
+            myservo1.write(pos1);
+            myservo0.write(188-pos1);            // tell servo to go to position in variable 'pos'
             delay(8);                       // waits 15ms for the servo to reach the position
           
           }
         }
         if(ps2x.Analog(PSS_LY)<128)
         {
-          Serial.print("\npos1 is: ");
+          Serial.print("\npos0 is: ");
           while(ps2x.Analog(PSS_LY)<127)
           { ps2x.read_gamepad();
+            //pos0--;
             pos1--;                                 // goes from 0 degrees to 180 degrees
-            if(pos1<0)
-            pos1=0;
+            if(pos1<90)
+            {
+              pos1=90;
+              //pos0=pos1+offset01;
+            }
             Serial.print(pos1);               // in steps of 1 degree
-            Serial.print("\n");
-            myservo1.write(pos1);            // tell servo to go to position in variable 'pos'
+            Serial.print("      ");
+            Serial.println(188-pos1);
+            myservo1.write(pos1);
+            myservo0.write(188-pos1);
+            //myservo1.write(pos1);            // tell servo to go to position in variable 'pos'
             delay(8);                       // waits 15ms for the servo to reach the position
           }
         }
-        if(ps2x.Analog(PSS_RX)>127)
+        if(ps2x.Analog(PSS_RX)<127)
         {
           Serial.print("\npos2 is: ");
           while(ps2x.Analog(PSS_RX)>128)
           { ps2x.read_gamepad();
             pos2++;                                 // goes from 0 degrees to 180 degrees
-            if(pos2 > 180)
-            pos2=180;                                 // in steps of 1 degree
+            if(pos2 > ul_2)
+            pos2=ul_2;                                 // in steps of 1 degree
             Serial.print(pos2);
             Serial.print("\n");
             myservo2.write(pos2);            // tell servo to go to position in variable 'pos'
             delay(10);                       // waits 15ms for the servo to reach the position
           }
         }
-        if(ps2x.Analog(PSS_RX)<127)
-        {
+        if(ps2x.Analog(PSS_RX)>127)
+         {
           Serial.print("\npos2 is: ");
           while(ps2x.Analog(PSS_RX)<127)
           { ps2x.read_gamepad();
             pos2--;                                 // goes from 0 degrees to 180 degrees
-            if(pos2 < 0)
-            pos2=0;                                 // in steps of 1 degree
+            if(pos2 < ll_2)
+            pos2=ll_2;                                 // in steps of 1 degree
             Serial.print(pos2);
             Serial.print("\n");
             myservo2.write(pos2);            // tell servo to go to position in variable 'pos'
@@ -313,6 +334,18 @@ void loop() {
      int x,y;
      if (ps2x.Button(PSB_R1)) // OMNI wheel
     {
+      /*digitalWrite(m1a,HIGH);
+      digitalWrite(m1b,LOW);
+      digitalWrite(m2a,HIGH);
+      digitalWrite(m2b,LOW);
+      digitalWrite(m3a,HIGH);
+      digitalWrite(m3b,LOW);
+      digitalWrite(m4a,HIGH);
+      digitalWrite(m4b,LOW);
+      analogWrite(en1,255);
+      analogWrite(en2,255);
+      analogWrite(en3,255);
+      analogWrite(en4,255);*/
       xVal1 = ps2x.Analog(PSS_LX);
       yVal1 = ps2x.Analog(PSS_LY);
       xVal2 = ps2x.Analog(PSS_RX);
@@ -334,43 +367,43 @@ void loop() {
       Serial.print(",");
       Serial.print(y);
       Serial.println(".");
-      int m2 = (-x + y) * cos(45);
-      int m1 = (-x - y) * cos(45);
-      int m4 = (x - y) * cos(45);
-      int m3 = (x + y) * cos(45);
+      int m1 = (-x + y) * cos(45);
+      int m2 = (x + y) * cos(45);
+      int m3 = (y - x) * cos(45);
+      int m4 = (x + y) * cos(45);
       if (m1 >= 0)
       {
-        m1 = map(m1, 0, 1000, 0, 254);
-        if (m1 > 255) {
-          m1 = 255;
-        }
-        digitalWrite(m1a, LOW);
-        digitalWrite(m1b, HIGH);
-      }
-      else
-      {
-        m1 = map(m1, 0, -1000, 0, 254);
-        if (m1 > 255) {
-          m1 = 255;
+        m1 = map(m1, 0, 1000, 0, 200);
+        if (m1 > 200) {
+          m1 = 200;
         }
         digitalWrite(m1a, HIGH);
         digitalWrite(m1b, LOW);
       }
+      else
+      {
+        m1 = map(m1, 0, -1000, 0, 200);
+        if (m1 > 200) {
+          m1 = 200;
+        }
+        digitalWrite(m1a, LOW);
+        digitalWrite(m1b, HIGH);
+      }
       analogWrite(en1, m1);
       if (m2 >= 0)
       {
-        m2 = map(m2, 0, 1000, 0, 254);
-        if (m2 > 255) {
-          m2 = 255;
+        m2 = map(m2, 0, 1000, 0, 200);
+        if (m2 > 200) {
+          m2 = 200;
         }
         digitalWrite(m2a, HIGH);
         digitalWrite(m2b, LOW);
       }
       else
       {
-        m2 = map(m2, 0, -1000, 0, 254);
-        if (m2 > 255) {
-          m2 = 255;
+        m2 = map(m2, 0, -1000, 0, 200);
+        if (m2 > 200) {
+          m2 = 200;
         }
         digitalWrite(m2a, LOW);
         digitalWrite(m2b, HIGH);
@@ -378,40 +411,40 @@ void loop() {
       analogWrite(en2, m2);
       if (m3 >= 0)
       {
-        m3 = map(m3, 0, 1000, 0, 254);
-        if (m3 > 255) {
-          m3 = 255;
-        }
-        digitalWrite(m3a, LOW);
-        digitalWrite(m3b, HIGH);
-      }
-      else
-      {
-        m3 = map(m3, 0, -1000, 0, 254);
-        if (m3 > 255) {
-          m3 = 255;
+        m3 = map(m3, 0, 1000, 0, 200);
+        if (m3 > 200) {
+          m3 = 200;
         }
         digitalWrite(m3a, HIGH);
         digitalWrite(m3b, LOW);
       }
+      else
+      {
+        m3 = map(m3, 0, -1000, 0, 200);
+        if (m3 > 200) {
+          m3 = 200;
+        }
+        digitalWrite(m3a, LOW);
+        digitalWrite(m3b, HIGH);
+      }
       analogWrite(en3, m3);
       if (m4 >= 0)
       {
-        m4 = map(m4, 0, 1000, 0, 254);
-        if (m4 > 255) {
-          m4 = 255;
-        }
-        digitalWrite(m4a, LOW);
-        digitalWrite(m4b, HIGH);
-      }
-      else
-      {
-        m4 = map(m4, 0, -1000, 0, 254);
-        if (m4 > 255) {
-          m4 = 255;
+        m4 = map(m4, 0, 1000, 0, 200);
+        if (m4 > 200) {
+          m4 = 200;
         }
         digitalWrite(m4a, HIGH);
         digitalWrite(m4b, LOW);
+      }
+      else
+      {
+        m4 = map(m4, 0, -1000, 0, 200);
+        if (m4 > 200) {
+          m4 = 200;
+        }
+        digitalWrite(m4a, LOW);
+        digitalWrite(m4b, HIGH);
       }
       analogWrite(en4, m4);
       Serial.print(m1);
@@ -422,7 +455,7 @@ void loop() {
       Serial.print(",");
       Serial.print(m4);
       Serial.print(",");
-      if (xVal2 < 50)   //lx
+      if (xVal2 > 190)   //lx
       {
         digitalWrite(m1a, LOW);
         digitalWrite(m1b, HIGH);
@@ -432,13 +465,13 @@ void loop() {
         digitalWrite(m3b, HIGH);
         digitalWrite(m4a, LOW);
         digitalWrite(m4b, HIGH);
-        digitalWrite(en1, HIGH);
-        digitalWrite(en2, HIGH);
-        digitalWrite(en3, HIGH);
-        digitalWrite(en4, HIGH);
+        analogWrite(en1, 170);
+        analogWrite(en2, 170);
+        analogWrite(en3, 170);
+        analogWrite(en4, 170);
         Serial.println("Anticlockwise rotate");
       }
-      else if (xVal2 > 190)   //lx
+      else if (xVal2 < 50)   //lx
       {
         digitalWrite(m1b, LOW);
         digitalWrite(m1a, HIGH);
@@ -448,10 +481,10 @@ void loop() {
         digitalWrite(m3a, HIGH);
         digitalWrite(m4b, LOW);
         digitalWrite(m4a, HIGH);
-        digitalWrite(en1, HIGH);
-        digitalWrite(en2, HIGH);
-        digitalWrite(en3, HIGH);
-        digitalWrite(en4, HIGH);
+        analogWrite(en1, 170);
+        analogWrite(en2, 170);
+        analogWrite(en3, 170);
+        analogWrite(en4, 170);
         Serial.println("Clockwise rotate");
       }
     }
