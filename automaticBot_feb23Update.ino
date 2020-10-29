@@ -1,3 +1,21 @@
+#define m1a 35
+#define m1b 37
+#define m2a 39
+#define m2b 41
+#define m3a 49
+#define m3b 45
+#define m4a 47
+#define m4b 43
+#define en1 11
+#define en2 10
+#define en3 9
+#define en4 8
+#define jp1 3
+#define jp2 23
+#define jp3 51
+#define R1 29
+#define s1 33
+
 int x = 0, u = 0;
 int mspeed = 0;
 
@@ -30,30 +48,13 @@ const byte rx = 0;    // Defining pin 0 as Rx
 const byte tx = 1;    // Defining pin 1 as Tx
 //const byte serialEn = 2;    // Connect UART output enable of LSA08 to pin 2
 
-#define m1a 35
-#define m1b 37
-#define m2a 39
-#define m2b 41
-#define m3a 49
-#define m3b 45
-#define m4a 47
-#define m4b 43
-#define en1 11
-#define en2 10
-#define en3 9
-#define en4 8
-#define jp1 3
-#define jp2 23
-#define jp3 51
-#define R1 29
-#define s1 33
 //****************************************************************SETUP****************************************************
 void setup() {
-  pinMode(A0, INPUT);
+  //pinMode(A0, INPUT);
   analogWrite(A0, 0);
-  pinMode(A1, INPUT);
+  //pinMode(A1, INPUT);
   analogWrite(A1, 0);
-  pinMode(A2, INPUT);
+  //pinMode(A2, INPUT);
   analogWrite(A2, 0);
 
   pinMode(R1, OUTPUT);
@@ -117,7 +118,8 @@ void lsa1()
   Serial.print(positionVal1);
   Serial.print("\t\t");
   pulse1 = digitalRead(jp1);
-  Serial.print(pulse1); if (pulse1 == 1)
+  Serial.print(pulse1); 
+  if (pulse1 == 1)
     Serial.println("junction 1");
   Serial.println("lsa1 khatam");
 }
