@@ -604,14 +604,14 @@ void loop() {
          analogWrite(en4, 0);
          flg1 = 2;
         }*/
-      Serial.print("x=");
-      Serial.println(x);
+      //Serial.print("x=");
+      //Serial.println(x);
       lfrnorth();
     }
     for (int r = 0; r < 200; r++)
     {
       northstop(200);
-      delay(1);
+      //delay(1);
       lsa1();
       lsa2();
       lsa3();
@@ -629,10 +629,10 @@ void loop() {
     delay(100);
     for (int fllg = 0; fllg < 3000; fllg++)
     {
-      Serial.print("x=");
-      Serial.println(x);
-      //    align();
-      delay(1);
+      //Serial.print("x=");
+      //Serial.println(x);
+         align();
+      //delay(1);
     }
     //   shoot();
   }
