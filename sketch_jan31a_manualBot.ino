@@ -13,13 +13,14 @@
 #define en2 36
 #define en3 40
 #define en4 44
-int Xin1= A0; // X Input Pin
-int Yin1= A1; // Y Input Pin
-int KEYin1 = 3; // Push Button
 
-int Xin2= A2; // X Input Pin
-int Yin2= A3; // Y Input Pin
-int KEYin2 = 4; // Push Button
+uint8_t Xin1= A0; // X Input Pin
+uint8_t Yin1= A1; // Y Input Pin
+uint8_t KEYin1 = 3; // Push Button
+
+uint8_t Xin2= A2; // X Input Pin
+uint8_t Yin2= A3; // Y Input Pin
+uint8_t KEYin2 = 4; // Push Button
 void setup ()
 {
   pinMode (KEYin1, INPUT);
@@ -28,7 +29,7 @@ void setup ()
 }
 void loop ()
 {
-  int y14,y23,xVal1, yVal1, buttonVal1,xVal2, yVal2, buttonVal2;
+  uint8_t y14,y23,xVal1, yVal1, buttonVal1,xVal2, yVal2, buttonVal2;
   
   xVal1 = analogRead (Xin1);
   yVal1 = analogRead (Yin1);
